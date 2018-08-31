@@ -3,9 +3,9 @@ import org.openqa.selenium.WebDriver;
 
 public class Login {
 
-    String loginUrl;
-    String username;
-    String password;
+    private String loginUrl;
+    private String username;
+    private String password;
 
 
     public Login(String loginUrl, String username, String password){

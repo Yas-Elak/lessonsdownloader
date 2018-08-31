@@ -1,12 +1,7 @@
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.*;
-import java.util.List;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import java.util.ArrayList;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.List;
 
 public class VideoDownloader {
 
@@ -14,26 +9,44 @@ public class VideoDownloader {
 
     public static void main(String[] args) {
 
-        String chromeDriverPath = "D:\\OneDrive\\Programmation\\Projet perso\\DdlHtml5Tag\\chromedriver_win32\\chromedriver.exe";
+        // Starting by initializing the different path I will need
+        //first for selenium
+        String chromeDriverPath = "Path to the chromedriver.exe";
         String webDriverType = "webdriver.chrome.driver";
 
-        String parentUrl = "https://codewithmosh.com/courses/enrolled/225147";
-        String filePath = "D:\\OneDrive\\Programmation\\Projet perso\\DdlHtml5Tag\\";
+        //then for the course I want to download and where I want to download it
+        String urlCourse = "url of the course who get all the lessons";
+        String whereToDownload = "path of where I want to download them";
 
-        List<String> urlDownloadLink = new ArrayList<>();
+        List<String> urlDownloadLink;
+        List<String> nameOfTheLesson;
 
+        //I set up selenium
         System.setProperty(webDriverType,chromeDriverPath);
         WebDriver driver = new ChromeDriver();
 
-        Login login = new Login("https://sso.teachable.com/secure/146684/users/sign_in?clean_login=true&reset_purchase_session=1",
-                "Elalaoui87@gmail.com", "Calibur87?");
+        //if i need to be logged on the website I use this object
+        Login login = new Login("url of the login page",
+                "my username", "my password");
         login.logMe(driver, "user_email", "user_password", "commit");
 
+        //then I retrieve the different link to download and a name because their link are something like .../1565616
         RetrieveDownloadLink rdl = new RetrieveDownloadLink(driver);
-        urlDownloadLink = rdl.getListOfDownloadLink(parentUrl);
+        urlDownloadLink = rdl.getListOfDownloadLink(urlCourse);
+        nameOfTheLesson = rdl.getNameOfTheLessons();
+
+        //If I ever want to use a different software to download them, I create a text file with the link to download
+        PrintToTxtFile printToTxtFile = new PrintToTxtFile(urlDownloadLink);
+        printToTxtFile.generateTextFile(whereToDownload, urlCourse);
+
+        //I download them (still slow but the website I want is already slow)
+        HttpDownloadUtility hdu = new HttpDownloadUtility();
+        try {
+            hdu.downloadFile(urlDownloadLink, whereToDownload, nameOfTheLesson);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
 
-
-        System.out.print("Check");
     }
 }
